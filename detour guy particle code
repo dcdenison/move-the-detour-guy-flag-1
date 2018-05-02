@@ -1,0 +1,83 @@
+// create servo object to control a servo
+//this is to move the detour flag
+Servo myservo;
+// variable to store the servo position
+int pos = 0;
+
+// NEW LINES HERE!   ******************************************************************
+// DC: you can play with these values so the DETOUR panel shows correctly
+//default parameters: 120, 140
+const int servoInitialPosition = 90;
+const int servoFinalPosition = 280;
+//was 180
+// GOAL: the servo will move from the initial position to the final position
+// giving the ilussion that the worker is moving the detour sign
+
+// this function gets executed once, when the photon boots up
+void setup()
+{
+  // attaches the servo on the D0 pin to the servo object
+  myservo.attach(D0);
+
+  // original functions, I left them here just in case
+  //Particle.function("setpos", setPosition);
+  //Particle.variable("getpos", pos);
+
+  // NEW LINES HERE!   ******************************************************************
+  // new function to make the worker move the DETOUR sign
+  Particle.function("moveit", moveit);
+
+  // make the servo move to its initial position when the photon boots up
+  myservo.write(servoInitialPosition);
+}
+
+// this function gets executed continuously, as long as the photon has power
+void loop()
+{
+  // since there is nothing to execute, the photon will remain idle, looking at us 
+  // until we decide to hit one of its cloud functions, like moveit()
+}
+
+int setPosition(String posValue)
+{
+  pos = posValue.toInt();
+  myservo.write(pos);
+  return 0;
+}
+
+// NEW LINES HERE!   ******************************************************************
+// DC: you can play with this value so the DETOUR panel moves smoothly
+const int bounceDelay = 1000;
+
+int moveit(String dummy)
+{
+
+  Particle.publish("activated!", "booma", 60, PRIVATE);
+
+  // the servo should be already at the initial position, but just in case
+  myservo.write(servoInitialPosition);
+  delay(bounceDelay);
+
+  // this is the first DETOUR sign movement
+  oneMovement();
+
+  // this is the second DETOUR sign movement
+  oneMovement();
+
+  // this is third DETOUR sign movement
+  oneMovement();
+
+  // DC: are 3 movements fine? feel free to add/remove movements at will
+
+  return 0;
+}
+
+// this function aims at making one DETOUR sign movement
+// it assumes the servo is at its initial position!
+void oneMovement()
+{
+  myservo.write(servoFinalPosition);
+  delay(bounceDelay);
+  myservo.write(servoInitialPosition);
+  delay(bounceDelay);
+}
